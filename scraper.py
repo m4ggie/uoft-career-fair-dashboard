@@ -107,13 +107,12 @@ for idx, card in enumerate(cards):
         print(f"Error parsing panel for {employer_name}: {e}")
 
     employers.append(employer_data)
-    import pandas as pd
 
-# Load your scraped CSV
-df = pd.read_csv("uoft_career_fair_employers.csv")
+df = pd.DataFrame(employers)
 
 # Shift the Employer column up by 1
 df["Employer"] = df["Employer"].shift(-1)
+df["Link"] = df["Link"].shift(-1)
 
 # Drop the last row (which will now have NaN in Employer)
 df = df[:-1]
