@@ -87,21 +87,22 @@ st.write(f"**Results: {len(filtered_df)} employers found**")
 if len(filtered_df) == 0:
     st.warning("No employers match the selected filters.")
 else:
-    # --- Display Cards in Responsive Flexbox Layout ---
+    # --- Display Cards in 3-per-row layout ---
     cards_per_row = 3
     fixed_card_height = "420px"  # Fixed height for all cards
 
     for row_idx in range(0, len(filtered_df), cards_per_row):
         row_df = filtered_df.iloc[row_idx:row_idx+cards_per_row]
 
-        # Open a flex container for the row
+        # Flex container for row
         st.markdown("<div style='display: flex; gap: 20px;'>", unsafe_allow_html=True)
 
         for _, row in row_df.iterrows():
             logo_url = row.get("Logo", "")
             card_html = f"""
             <div style='
-                flex: 1;
+                flex: 0 0 32%;
+                max-width: 32%;
                 border: 1px solid #ccc;
                 padding: 15px;
                 border-radius: 10px;
@@ -134,6 +135,5 @@ else:
 
             st.markdown(card_html, unsafe_allow_html=True)
 
-        # Close flex container
         st.markdown("</div>", unsafe_allow_html=True)
         st.markdown("<br>", unsafe_allow_html=True)  # spacing between rows
