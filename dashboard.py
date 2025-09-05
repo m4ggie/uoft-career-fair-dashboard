@@ -98,34 +98,32 @@ else:
         for i, (_, row) in enumerate(row_df.iterrows()):
             with cols[i]:
                 logo_url = row.get("Logo", "")
-                st.markdown(f"""
+                level_of_study = ', '.join(row['Level of Study_list'])
+                hiring_for = ', '.join(row['Hiring For_list'])
+                target_programs = ', '.join(row['Target Programs_list'])
+                opportunities = ', '.join(row['Opportunities_list'])
+                
+                card_html = f"""
                 <div style='
                     border: 1px solid #ccc;
                     border-radius: 10px;
                     padding: 15px;
                     display: flex;
                     flex-direction: column;
-                    justify-content: space-between;
+                    justify-content: flex-start;
                     background-color: #fefefe;
                     height: {fixed_card_height}px;
                     box-sizing: border-box;
                     overflow: hidden;
-                    cursor: default;
-                    text-decoration: none;
                 '>
-                """, unsafe_allow_html=True)
-
-                # Logo
-                if pd.notnull(logo_url) and logo_url != "":
-                    st.image(logo_url, width=150)
-
-                # Employer info
-                st.markdown(f"<h3>{row['Employer']}</h3>", unsafe_allow_html=True)
-                st.markdown(f"<p><a href='{row['Link']}' target='_blank'>Website</a></p>", unsafe_allow_html=True)
-                st.markdown(f"<p><strong>Level of Study:</strong> {', '.join(row['Level of Study_list'])}</p>", unsafe_allow_html=True)
-                st.markdown(f"<p><strong>Hiring For:</strong> {', '.join(row['Hiring For_list'])}</p>", unsafe_allow_html=True)
-                st.markdown(f"<p><strong>Target Programs:</strong> {', '.join(row['Target Programs_list'])}</p>", unsafe_allow_html=True)
-                st.markdown(f"<p><strong>Industry:</strong> {row['Industry']}</p>", unsafe_allow_html=True)
-                st.markdown(f"<p><strong>Opportunities:</strong> {', '.join(row['Opportunities_list'])}</p>", unsafe_allow_html=True)
-
-                st.markdown("</div>", unsafe_allow_html=True)
+                    {"<img src='" + logo_url + "' width='150'>" if pd.notnull(logo_url) and logo_url != "" else ""}
+                    <h3>{row['Employer']}</h3>
+                    <p><a href='{row['Link']}' target='_blank'>Website</a></p>
+                    <p><strong>Level of Study:</strong> {level_of_study}</p>
+                    <p><strong>Hiring For:</strong> {hiring_for}</p>
+                    <p><strong>Target Programs:</strong> {target_programs}</p>
+                    <p><strong>Industry:</strong> {row['Industry']}</p>
+                    <p><strong>Opportunities:</strong> {opportunities}</p>
+                </div>
+                """
+                st.markdown(card_html, unsafe_allow_html=True)
