@@ -57,14 +57,19 @@ with st.sidebar:
 
     # Deselect All Filters
     if st.button("Deselect All Filters"):
-        st.session_state.update({
-            "search_name": "",
-            "level_filter": [],
-            "hiring_filter": [],
-            "program_filter": [],
-            "industry_filter": [],
-            "opportunity_filter": []
-    })
+        if "search_name" in st.session_state:
+            st.session_state["search_name"] = ""
+        if "level_filter" in st.session_state:
+            st.session_state["level_filter"] = []
+        if "hiring_filter" in st.session_state: 
+            st.session_state["hiring_filter"] = []
+        if "program_filter" in st.session_state:
+            st.session_state["program_filter"] = []
+        if "industry_filter" in st.session_state:
+            st.session_state["industry_filter"] = []
+        if "opportunity_filter" in st.session_state:
+            st.session_state["opportunity_filter"] = []
+        st.experimental_rerun()
 
 
 # --- Filter function ---
