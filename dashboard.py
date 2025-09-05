@@ -1,5 +1,6 @@
 import streamlit as st
 import pandas as pd
+st.set_page_config(page_title="2025 Uoft Career Fair Navigator")
 
 # --- Load CSV ---
 df = pd.read_csv("uoft_career_fair_employers.csv")
