@@ -106,7 +106,7 @@ else:
                     border: 1px solid #ccc;
                     padding: 15px;
                     border-radius: 10px;
-                    background-color: #fefefe;
+                    
                     display: flex;
                     flex-direction: column;
                     justify-content: space-between;
