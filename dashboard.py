@@ -20,6 +20,13 @@ st.markdown("---")
 st.markdown("<h4 style='text-align:center; color: #555;'>Review employers dynamically through customizable filters. We will be employed 🙏</h4>", unsafe_allow_html=True)
 st.markdown("---")
 
+def reset_filters():
+    st.session_state["search_name"] = ""
+    st.session_state["level_filter"] = []
+    st.session_state["hiring_filter"] = []
+    st.session_state["program_filter"] = []
+    st.session_state["industry_filter"] = []
+    st.session_state["opportunity_filter"] = []
 
 # --- Sidebar ---
 with st.sidebar:
@@ -55,22 +62,7 @@ with st.sidebar:
         key="opportunity_filter"
     )
 
-    # Deselect All Filters
-    if st.button("Deselect All Filters"):
-        if "search_name" in st.session_state:
-            st.session_state["search_name"] = ""
-        if "level_filter" in st.session_state:
-            st.session_state["level_filter"] = []
-        if "hiring_filter" in st.session_state: 
-            st.session_state["hiring_filter"] = []
-        if "program_filter" in st.session_state:
-            st.session_state["program_filter"] = []
-        if "industry_filter" in st.session_state:
-            st.session_state["industry_filter"] = []
-        if "opportunity_filter" in st.session_state:
-            st.session_state["opportunity_filter"] = []
-        st.experimental_rerun()
-
+    st.button("Reset Filters", on_click=reset_filters)
 
 # --- Filter function ---
 def filter_df(df):
