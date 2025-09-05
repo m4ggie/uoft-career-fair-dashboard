@@ -12,15 +12,17 @@ for col in multi_cols:
 # --- Page config ---
 st.set_page_config(page_title="UofT Career Fair Dashboard", layout="wide")
 
-# --- Top header and subheader ---
+# --- Top header ---
 st.markdown("<h1 style='text-align:center;'>UofT Career Fair 2025 Employers Dashboard</h1>", unsafe_allow_html=True)
+st.markdown("---")
 st.markdown("<h4 style='text-align:center; color: #555;'>Review employers dynamically through customizable filters. These coming years will surely be ones of employment 🙏</h4>", unsafe_allow_html=True)
 st.markdown("---")
 
-# --- Sidebar filters ---
-with st.sidebar:
-    st.markdown("### 🔹 Filters")
 
+# --- Sidebar ---
+with st.sidebar:
+    st.markdown("###  Filters")
+    
     # Search Employer by Name
     search_name = st.text_input("Search Employer by Name", key="search_name")
 
@@ -77,53 +79,55 @@ def filter_df(df):
         temp = temp[temp["Opportunities_list"].apply(lambda x: any(i in x for i in opportunity_filter))]
     return temp
 
-# --- Apply filters ---
+# Apply filters
 filtered_df = filter_df(df)
 
 # --- Results count ---
 st.write(f"**Results: {len(filtered_df)} employers found**")
 
-# --- Handle no matches ---
+# Handle no matches
 if len(filtered_df) == 0:
     st.warning("No employers match the selected filters.")
 else:
-    # --- Display Cards in 3-per-row layout ---
+    # --- Display Cards in Responsive Layout ---
     cards_per_row = 3
-    fixed_card_height = 420  # px
+    min_card_height = "420px"  # Equal card height
 
     for row_idx in range(0, len(filtered_df), cards_per_row):
-        row_df = filtered_df.iloc[row_idx:row_idx+cards_per_row]
-        cols = st.columns(cards_per_row)
-
-        for i, (_, row) in enumerate(row_df.iterrows()):
-            with cols[i]:
+        cols = st.columns(cards_per_row, gap="large")
+        for i, (_, row) in enumerate(filtered_df.iloc[row_idx:row_idx+cards_per_row].iterrows()):
+            col = cols[i]
+            with col:
                 logo_url = row.get("Logo", "")
-                level_of_study = ', '.join(row['Level of Study_list'])
-                hiring_for = ', '.join(row['Hiring For_list'])
-                target_programs = ', '.join(row['Target Programs_list'])
-                opportunities = ', '.join(row['Opportunities_list'])
-                
                 card_html = f"""
                 <div style='
                     border: 1px solid #ccc;
-                    border-radius: 10px;
                     padding: 15px;
+                    border-radius: 10px;
+                    background-color: #fefefe;
                     display: flex;
                     flex-direction: column;
-                    justify-content: flex-start;
-                    background-color: #fefefe;
-                    height: {fixed_card_height}px;
-                    box-sizing: border-box;
-                    overflow: hidden;
+                    justify-content: space-between;
+                    min-height: {min_card_height};
                 '>
-                    {"<img src='" + logo_url + "' width='150'>" if pd.notnull(logo_url) and logo_url != "" else ""}
-                    <h3>{row['Employer']}</h3>
-                    <p><a href='{row['Link']}' target='_blank'>Website</a></p>
-                    <p><strong>Level of Study:</strong> {level_of_study}</p>
-                    <p><strong>Hiring For:</strong> {hiring_for}</p>
-                    <p><strong>Target Programs:</strong> {target_programs}</p>
-                    <p><strong>Industry:</strong> {row['Industry']}</p>
-                    <p><strong>Opportunities:</strong> {opportunities}</p>
+                """
+
+                # Logo
+                if pd.notnull(logo_url) and logo_url != "":
+                    card_html += f"<img src='{logo_url}' width='150'>"
+
+                # Employer info
+                card_html += f"""
+                <h3>{row['Employer']}</h3>
+                <p><a href='{row['Link']}' target='_blank'>Website</a></p>
+                <p><strong>Level of Study:</strong> {', '.join(row['Level of Study_list'])}</p>
+                <p><strong>Hiring For:</strong> {', '.join(row['Hiring For_list'])}</p>
+                <p><strong>Target Programs:</strong> {', '.join(row['Target Programs_list'])}</p>
+                <p><strong>Industry:</strong> {row['Industry']}</p>
+                <p><strong>Opportunities:</strong> {', '.join(row['Opportunities_list'])}</p>
                 </div>
                 """
+
                 st.markdown(card_html, unsafe_allow_html=True)
+
+        st.markdown("")  # spacing between rows
