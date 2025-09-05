@@ -12,17 +12,15 @@ for col in multi_cols:
 # --- Page config ---
 st.set_page_config(page_title="UofT Career Fair Dashboard", layout="wide")
 
-# --- Top header ---
+# --- Top header and subheader ---
 st.markdown("<h1 style='text-align:center;'>UofT Career Fair 2025 Employers Dashboard</h1>", unsafe_allow_html=True)
-st.markdown("---")
 st.markdown("<h4 style='text-align:center; color: #555;'>Review employers dynamically through customizable filters. These coming years will surely be ones of employment 🙏</h4>", unsafe_allow_html=True)
 st.markdown("---")
 
-
-# --- Sidebar ---
+# --- Sidebar filters ---
 with st.sidebar:
-    st.markdown("###  Filters")
-    
+    st.markdown("### 🔹 Filters")
+
     # Search Employer by Name
     search_name = st.text_input("Search Employer by Name", key="search_name")
 
@@ -79,55 +77,55 @@ def filter_df(df):
         temp = temp[temp["Opportunities_list"].apply(lambda x: any(i in x for i in opportunity_filter))]
     return temp
 
-# Apply filters
+# --- Apply filters ---
 filtered_df = filter_df(df)
 
 # --- Results count ---
 st.write(f"**Results: {len(filtered_df)} employers found**")
 
-# Handle no matches
+# --- Handle no matches ---
 if len(filtered_df) == 0:
     st.warning("No employers match the selected filters.")
 else:
-    # --- Display Cards in Responsive Layout ---
+    # --- Display Cards in 3-per-row layout ---
     cards_per_row = 3
-    min_card_height = "420px"  # Equal card height
+    fixed_card_height = 420  # px
 
     for row_idx in range(0, len(filtered_df), cards_per_row):
-        cols = st.columns(cards_per_row, gap="large")
-        for i, (_, row) in enumerate(filtered_df.iloc[row_idx:row_idx+cards_per_row].iterrows()):
-            col = cols[i]
-            with col:
+        row_df = filtered_df.iloc[row_idx:row_idx+cards_per_row]
+        cols = st.columns(cards_per_row)
+
+        for i, (_, row) in enumerate(row_df.iterrows()):
+            with cols[i]:
                 logo_url = row.get("Logo", "")
-                card_html = f"""
+                st.markdown(f"""
                 <div style='
                     border: 1px solid #ccc;
-                    padding: 15px;
                     border-radius: 10px;
-                    background-color: #fefefe;
+                    padding: 15px;
                     display: flex;
                     flex-direction: column;
                     justify-content: space-between;
-                    min-height: {min_card_height};
+                    background-color: #fefefe;
+                    height: {fixed_card_height}px;
+                    box-sizing: border-box;
+                    overflow: hidden;
+                    cursor: default;
+                    text-decoration: none;
                 '>
-                """
+                """, unsafe_allow_html=True)
 
                 # Logo
                 if pd.notnull(logo_url) and logo_url != "":
-                    card_html += f"<img src='{logo_url}' width='150'>"
+                    st.image(logo_url, width=150)
 
                 # Employer info
-                card_html += f"""
-                <h3>{row['Employer']}</h3>
-                <p><a href='{row['Link']}' target='_blank'>Website</a></p>
-                <p><strong>Level of Study:</strong> {', '.join(row['Level of Study_list'])}</p>
-                <p><strong>Hiring For:</strong> {', '.join(row['Hiring For_list'])}</p>
-                <p><strong>Target Programs:</strong> {', '.join(row['Target Programs_list'])}</p>
-                <p><strong>Industry:</strong> {row['Industry']}</p>
-                <p><strong>Opportunities:</strong> {', '.join(row['Opportunities_list'])}</p>
-                </div>
-                """
+                st.markdown(f"<h3>{row['Employer']}</h3>", unsafe_allow_html=True)
+                st.markdown(f"<p><a href='{row['Link']}' target='_blank'>Website</a></p>", unsafe_allow_html=True)
+                st.markdown(f"<p><strong>Level of Study:</strong> {', '.join(row['Level of Study_list'])}</p>", unsafe_allow_html=True)
+                st.markdown(f"<p><strong>Hiring For:</strong> {', '.join(row['Hiring For_list'])}</p>", unsafe_allow_html=True)
+                st.markdown(f"<p><strong>Target Programs:</strong> {', '.join(row['Target Programs_list'])}</p>", unsafe_allow_html=True)
+                st.markdown(f"<p><strong>Industry:</strong> {row['Industry']}</p>", unsafe_allow_html=True)
+                st.markdown(f"<p><strong>Opportunities:</strong> {', '.join(row['Opportunities_list'])}</p>", unsafe_allow_html=True)
 
-                st.markdown(card_html, unsafe_allow_html=True)
-
-        st.markdown("")  # spacing between rows
+                st.markdown("</div>", unsafe_allow_html=True)
