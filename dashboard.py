@@ -20,34 +20,44 @@ st.markdown("---")
 with st.sidebar:
     st.markdown("### 🔹 Filters")
     
-    search_name = st.text_input("Search Employer by Name")
+    # Search Employer by Name
+    search_name = st.text_input("Search Employer by Name", key="search_name")
 
-    with st.expander("Adjust Filters ⬅️", expanded=True):  # small tab symbol hint
-        level_filter = st.multiselect(
-            "Level of Study",
-            options=sorted(set(sum(df["Level of Study_list"].tolist(), [])))
-        )
-        hiring_filter = st.multiselect(
-            "Hiring For",
-            options=sorted(set(sum(df["Hiring For_list"].tolist(), [])))
-        )
-        program_filter = st.multiselect(
-            "Target Programs",
-            options=sorted(set(sum(df["Target Programs_list"].tolist(), [])))
-        )
-        industry_filter = st.multiselect(
-            "Industry",
-            options=sorted(df["Industry"].dropna().unique())
-        )
-        opportunity_filter = st.multiselect(
-            "Opportunities",
-            options=sorted(set(sum(df["Opportunities_list"].tolist(), [])))
-        )
+    # Multi-select filters
+    level_filter = st.multiselect(
+        "Level of Study",
+        options=sorted(set(sum(df["Level of Study_list"].tolist(), []))),
+        key="level_filter"
+    )
+    hiring_filter = st.multiselect(
+        "Hiring For",
+        options=sorted(set(sum(df["Hiring For_list"].tolist(), []))),
+        key="hiring_filter"
+    )
+    program_filter = st.multiselect(
+        "Target Programs",
+        options=sorted(set(sum(df["Target Programs_list"].tolist(), []))),
+        key="program_filter"
+    )
+    industry_filter = st.multiselect(
+        "Industry",
+        options=sorted(df["Industry"].dropna().unique()),
+        key="industry_filter"
+    )
+    opportunity_filter = st.multiselect(
+        "Opportunities",
+        options=sorted(set(sum(df["Opportunities_list"].tolist(), []))),
+        key="opportunity_filter"
+    )
 
+    # Deselect All Filters
     if st.button("Deselect All Filters"):
-        st.experimental_rerun()
-    
-    apply_filters = st.button("Search")
+        st.session_state.search_name = ""
+        st.session_state.level_filter = []
+        st.session_state.hiring_filter = []
+        st.session_state.program_filter = []
+        st.session_state.industry_filter = []
+        st.session_state.opportunity_filter = []
 
 # --- Filter function ---
 def filter_df(df):
@@ -78,7 +88,7 @@ if len(filtered_df) == 0:
 else:
     # --- Display Cards in Responsive Layout ---
     cards_per_row = 3
-    min_card_height = "420px"  # adjust depending on content
+    min_card_height = "420px"  # Equal card height
 
     for row_idx in range(0, len(filtered_df), cards_per_row):
         cols = st.columns(cards_per_row, gap="large")
@@ -86,33 +96,35 @@ else:
             col = cols[i]
             with col:
                 logo_url = row.get("Logo", "")
-                # Card container with equal height
-                st.markdown(
-                    f"""
-                    <div style='
-                        border: 1px solid #ccc;
-                        padding: 15px;
-                        border-radius: 10px;
-                        background-color: #fefefe;
-                        display: flex;
-                        flex-direction: column;
-                        justify-content: space-between;
-                        min-height: {min_card_height};
-                    '>
-                    """, unsafe_allow_html=True
-                )
+                card_html = f"""
+                <div style='
+                    border: 1px solid #ccc;
+                    padding: 15px;
+                    border-radius: 10px;
+                    background-color: #fefefe;
+                    display: flex;
+                    flex-direction: column;
+                    justify-content: space-between;
+                    min-height: {min_card_height};
+                '>
+                """
 
+                # Logo
                 if pd.notnull(logo_url) and logo_url != "":
-                    st.image(logo_url, width=150)
+                    card_html += f"<img src='{logo_url}' width='150'>"
 
-                st.markdown(f"<h3>{row['Employer']}</h3>", unsafe_allow_html=True)
-                st.markdown(f"[Website]({row['Link']})")
-                st.markdown(f"**Level of Study:** {', '.join(row['Level of Study_list'])}")
-                st.markdown(f"**Hiring For:** {', '.join(row['Hiring For_list'])}")
-                st.markdown(f"**Target Programs:** {', '.join(row['Target Programs_list'])}")
-                st.markdown(f"**Industry:** {row['Industry']}")
-                st.markdown(f"**Opportunities:** {', '.join(row['Opportunities_list'])}")
+                # Employer info
+                card_html += f"""
+                <h3>{row['Employer']}</h3>
+                <p><a href='{row['Link']}' target='_blank'>Website</a></p>
+                <p><strong>Level of Study:</strong> {', '.join(row['Level of Study_list'])}</p>
+                <p><strong>Hiring For:</strong> {', '.join(row['Hiring For_list'])}</p>
+                <p><strong>Target Programs:</strong> {', '.join(row['Target Programs_list'])}</p>
+                <p><strong>Industry:</strong> {row['Industry']}</p>
+                <p><strong>Opportunities:</strong> {', '.join(row['Opportunities_list'])}</p>
+                </div>
+                """
 
-                st.markdown("</div>", unsafe_allow_html=True)
+                st.markdown(card_html, unsafe_allow_html=True)
 
         st.markdown("")  # spacing between rows
