@@ -4,6 +4,7 @@ st.set_page_config(page_title="2025 Uoft Career Fair Navigator")
 
 # --- Load CSV ---
 df = pd.read_csv("uoft_career_fair_employers_cleaned.csv")
+#hello
 
 # Convert multi-value fields into lists for filtering
 multi_cols = ["Level of Study", "Hiring For", "Target Programs", "Opportunities"]
@@ -16,7 +17,7 @@ st.set_page_config(page_title="UofT Career Fair Dashboard", layout="wide")
 # --- Top header ---
 st.markdown("<h1 style='text-align:center;'>UofT Career Fair 2025 Employers Dashboard</h1>", unsafe_allow_html=True)
 st.markdown("---")
-st.markdown("<h4 style='text-align:center; color: #555;'>Review employers dynamically through customizable filters. These coming years will surely be ones of employment 🙏</h4>", unsafe_allow_html=True)
+st.markdown("<h4 style='text-align:center; color: #555;'>Review employers dynamically through customizable filters. We will be employed 🙏</h4>", unsafe_allow_html=True)
 st.markdown("---")
 
 
@@ -56,12 +57,15 @@ with st.sidebar:
 
     # Deselect All Filters
     if st.button("Deselect All Filters"):
-        st.session_state.search_name = ""
-        st.session_state.level_filter = []
-        st.session_state.hiring_filter = []
-        st.session_state.program_filter = []
-        st.session_state.industry_filter = []
-        st.session_state.opportunity_filter = []
+        st.session_state.update({
+            "search_name": "",
+            "level_filter": [],
+            "hiring_filter": [],
+            "program_filter": [],
+            "industry_filter": [],
+            "opportunity_filter": []
+    })
+
 
 # --- Filter function ---
 def filter_df(df):
