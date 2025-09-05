@@ -9,13 +9,20 @@ multi_cols = ["Level of Study", "Hiring For", "Target Programs", "Opportunities"
 for col in multi_cols:
     df[col + "_list"] = df[col].apply(lambda x: x.split("|") if pd.notnull(x) else [])
 
+# --- Page config ---
+st.set_page_config(page_title="UofT Career Fair Dashboard", layout="wide")
+
+# --- Top header ---
+st.markdown("<h1 style='text-align:center;'>UofT Career Fair 2025 Employers Dashboard</h1>", unsafe_allow_html=True)
+st.markdown("---")
+
 # --- Sidebar ---
 with st.sidebar:
-    st.title("Filters")
-
+    st.markdown("### 🔹 Filters")
+    
     search_name = st.text_input("Search Employer by Name")
 
-    with st.expander("Filter Options", expanded=True):
+    with st.expander("Adjust Filters ⬅️", expanded=True):  # small tab symbol hint
         level_filter = st.multiselect(
             "Level of Study",
             options=sorted(set(sum(df["Level of Study_list"].tolist(), [])))
@@ -39,9 +46,10 @@ with st.sidebar:
 
     if st.button("Deselect All Filters"):
         st.experimental_rerun()
+    
     apply_filters = st.button("Search")
 
-# --- Filter Function ---
+# --- Filter function ---
 def filter_df(df):
     temp = df.copy()
     if search_name:
@@ -68,24 +76,43 @@ st.write(f"**Results: {len(filtered_df)} employers found**")
 if len(filtered_df) == 0:
     st.warning("No employers match the selected filters.")
 else:
-    # --- Display Cards in Scrolling Layout ---
-    # Responsive: 3 cards per row on desktop, fewer on narrow screens
+    # --- Display Cards in Responsive Layout ---
     cards_per_row = 3
+    min_card_height = "420px"  # adjust depending on content
+
     for row_idx in range(0, len(filtered_df), cards_per_row):
-        cols = st.columns(cards_per_row)
+        cols = st.columns(cards_per_row, gap="large")
         for i, (_, row) in enumerate(filtered_df.iloc[row_idx:row_idx+cards_per_row].iterrows()):
             col = cols[i]
             with col:
-                # Use logo if available, else show employer name only
                 logo_url = row.get("Logo", "")
+                # Card container with equal height
+                st.markdown(
+                    f"""
+                    <div style='
+                        border: 1px solid #ccc;
+                        padding: 15px;
+                        border-radius: 10px;
+                        background-color: #fefefe;
+                        display: flex;
+                        flex-direction: column;
+                        justify-content: space-between;
+                        min-height: {min_card_height};
+                    '>
+                    """, unsafe_allow_html=True
+                )
+
                 if pd.notnull(logo_url) and logo_url != "":
                     st.image(logo_url, width=150)
 
-                st.markdown(f"### {row['Employer']}")
+                st.markdown(f"<h3>{row['Employer']}</h3>", unsafe_allow_html=True)
                 st.markdown(f"[Website]({row['Link']})")
                 st.markdown(f"**Level of Study:** {', '.join(row['Level of Study_list'])}")
                 st.markdown(f"**Hiring For:** {', '.join(row['Hiring For_list'])}")
                 st.markdown(f"**Target Programs:** {', '.join(row['Target Programs_list'])}")
                 st.markdown(f"**Industry:** {row['Industry']}")
                 st.markdown(f"**Opportunities:** {', '.join(row['Opportunities_list'])}")
-                st.markdown("---")
+
+                st.markdown("</div>", unsafe_allow_html=True)
+
+        st.markdown("")  # spacing between rows
