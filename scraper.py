@@ -63,6 +63,16 @@ for idx, card in enumerate(cards):
         employer_link = link_elem.get_attribute("href")
     except:
         employer_link = "Not specified"
+        # --- Company logo ---
+    try:
+        logo_elem = card.find_element(By.CSS_SELECTOR, "img.kt-info-box-image")
+        logo_src = logo_elem.get_attribute("src")
+        # Make sure the URL is full, add domain if relative
+        if logo_src.startswith("/"):
+            logo_src = "https://studentlife.utoronto.ca" + logo_src
+    except:
+        logo_src = ""
+
 
     # Default data
     employer_data = {
@@ -72,7 +82,8 @@ for idx, card in enumerate(cards):
         "Hiring For": "Not specified",
         "Target Programs": "Not specified",
         "Industry": "Not specified",
-        "Opportunities": "Not specified"
+        "Opportunities": "Not specified",
+        "Logo": logo_src
     }
 
     # Parse accordion panel
@@ -113,6 +124,7 @@ df = pd.DataFrame(employers)
 # Shift the Employer column up by 1
 df["Employer"] = df["Employer"].shift(-1)
 df["Link"] = df["Link"].shift(-1)
+df["Logo"] = df["Logo"].shift(-1)
 
 # Drop the last row (which will now have NaN in Employer)
 df = df[:-1]
