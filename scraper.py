@@ -3,11 +3,12 @@ from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 from webdriver_manager.chrome import ChromeDriverManager
+from bs4 import BeautifulSoup
 import pandas as pd
 import re
 import time
 
-# --- Helpers ---
+# --- Helper functions ---
 def split_field(field_value, delimiter=","):
     if not field_value or field_value.strip() == "":
         return ["Not specified"]
@@ -16,6 +17,7 @@ def split_field(field_value, delimiter=","):
 def split_opportunities(op_value):
     if not op_value or op_value.strip() == "":
         return ["Not specified"]
+    # Split by comma or " and "
     return [x.strip() for x in re.split(r",| and ", op_value) if x.strip()]
 
 # --- Selenium setup ---
@@ -73,36 +75,54 @@ for idx, card in enumerate(cards):
         "Opportunities": "Not specified"
     }
 
-    # Corresponding panel
+    # Parse accordion panel
     try:
         panel = panels[idx]
-        panel_text = panel.get_attribute("innerText")
-        lines = panel_text.splitlines()
+        panel_html = panel.get_attribute("innerHTML")
+        soup = BeautifulSoup(panel_html, "html.parser")
+        paragraphs = soup.find_all("p")
 
-        for line in lines:
-            if ":" in line:
-                key, value = line.split(":", 1)
-                key = key.strip()
-                value = value.strip()
+        for p in paragraphs:
+            # Get full paragraph text
+            full_text = p.get_text(" ", strip=True)
 
-                if key.lower() == "level of study":
-                    employer_data["Level of Study"] = "|".join(split_field(value))
-                elif key.lower() == "hiring for":
-                    employer_data["Hiring For"] = "|".join(split_field(value))
-                elif key.lower() == "target programs":
-                    employer_data["Target Programs"] = "|".join(split_field(value))
-                elif key.lower() == "industry":
-                    employer_data["Industry"] = value if value else "Not specified"
-                elif key.lower() == "opportunities":
-                    employer_data["Opportunities"] = "|".join(split_opportunities(value))
-    except:
-        pass
+            # Remove all <strong> tags to get clean value
+            for s in p.find_all("strong"):
+                s.extract()
+            value = p.get_text(" ", strip=True)
+
+            # Regex-based detection using original full_text
+            if full_text.lower().startswith("level of study:"):
+                employer_data["Level of Study"] = "|".join(split_field(value))
+            elif full_text.lower().startswith("hiring for:"):
+                employer_data["Hiring For"] = "|".join(split_field(value))
+            elif full_text.lower().startswith("target programs:"):
+                employer_data["Target Programs"] = "|".join(split_field(value))
+            elif full_text.lower().startswith("industry:"):
+                employer_data["Industry"] = value if value else "Not specified"
+            elif full_text.lower().startswith("opportunities:"):
+                employer_data["Opportunities"] = "|".join(split_opportunities(value))
+
+    except Exception as e:
+        print(f"Error parsing panel for {employer_name}: {e}")
 
     employers.append(employer_data)
+    import pandas as pd
 
-# --- Save to CSV ---
-df = pd.DataFrame(employers)
+# Load your scraped CSV
+df = pd.read_csv("uoft_career_fair_employers.csv")
+
+# Shift the Employer column up by 1
+df["Employer"] = df["Employer"].shift(-1)
+
+# Drop the last row (which will now have NaN in Employer)
+df = df[:-1]
+
+# Save the fixed CSV
 df.to_csv("uoft_career_fair_employers.csv", index=False)
-print(f"✅ Scraped {len(employers)} employers and saved to CSV.")
+print("✅ Fixed Employer column and saved CSV.")
+
+
+
 
 driver.quit()
