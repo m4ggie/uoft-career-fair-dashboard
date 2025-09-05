@@ -3,7 +3,7 @@ import pandas as pd
 st.set_page_config(page_title="2025 Uoft Career Fair Navigator")
 
 # --- Load CSV ---
-df = pd.read_csv("uoft_career_fair_employers.csv")
+df = pd.read_csv("uoft_career_fair_employers_cleaned.csv")
 
 # Convert multi-value fields into lists for filtering
 multi_cols = ["Level of Study", "Hiring For", "Target Programs", "Opportunities"]
