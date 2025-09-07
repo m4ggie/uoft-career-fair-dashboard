@@ -101,12 +101,21 @@ else:
             col = cols[i]
             with col:
                 logo_url = row.get("Logo", "")
+                theme = st.get_option("theme.base")
+                if theme == "dark":
+                    card_bg = "FFFFFF"
+                else:
+                    card_bg = "fefefe"
+                    
                 card_html = f"""
+                
+                
                 <div style='
                     border: 1px solid #ccc;
                     padding: 15px;
                     border-radius: 10px;
                     display: flex;
+                    background-color: {card_bg};
                     flex-direction: column;
                     justify-content: space-between;
                     min-height: {min_card_height};
