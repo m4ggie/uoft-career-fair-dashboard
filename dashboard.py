@@ -17,7 +17,7 @@ st.set_page_config(page_title="UofT Career Fair Dashboard", layout="wide")
 # --- Top header ---
 st.markdown("<h1 style='text-align:center;'>UofT Career Fair 2025 Employers Dashboard</h1>", unsafe_allow_html=True)
 st.markdown("---")
-st.markdown("<h4 style='text-align:center; color: #555;'>Review employers dynamically through customizable filters. We will be employed 🙏</h4>", unsafe_allow_html=True)
+st.markdown("<h4 style='text-align:center; color: #555;'>Review employers dynamically through customizable filters.</h4>", unsafe_allow_html=True)
 st.markdown("---")
 
 def reset_filters():
