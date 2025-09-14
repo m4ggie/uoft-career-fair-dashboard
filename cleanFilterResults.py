@@ -38,7 +38,7 @@ def clean_target_programs(value):
     value = re.sub(r'Arts and Sciences', 'Arts & Science', str(value), flags=re.IGNORECASE)
     value = re.sub(r'Arts & Sciences', 'Arts & Science', str(value), flags=re.IGNORECASE)
     value = re.sub(r'Engineering and Technology', 'Engineering & Technology', str(value), flags=re.IGNORECASE)
-    value = re.sub(r'Engineering & Tech', 'Engineering & Technology', str(value), flags=re.IGNORECASE)
+    #value = re.sub(r'Engineering & Tech', 'Engineering & Technology', str(value), flags=re.IGNORECASE)
     return value
 
 def clean_opporunities(value):
