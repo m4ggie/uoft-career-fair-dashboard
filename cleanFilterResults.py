@@ -22,7 +22,7 @@ df = pd.read_csv("uoft_career_fair_employers.csv")
 
 def clean_level_of_study(value):
     value = re.sub(r'Graduate Full-time', 'Graduate', str(value), flags=re.IGNORECASE)
-    value = re.sub(r'Recent Graduate(s)?', 'Recent Graduates', str(value), flags=re.IGNORECASE)
+    value = re.sub(r'Recent Graduate', 'Recent Graduates', str(value), flags=re.IGNORECASE)
     return value
 
 def clean_hiring_for(value):
